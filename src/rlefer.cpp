@@ -12,20 +12,17 @@
 
 using namespace Rcpp;
 
-namespace lefer {
-
-// Main APIs of the library ================================================================
 
 // [[Rcpp::export]]
 SEXP even_spaced_curves_impl(SEXP x_start1,
-				      SEXP y_start1,
-				      SEXP n_curves1,
-				      SEXP n_steps1,
-				      SEXP min_steps_allowed1,
-				      SEXP step_length1,
-				      SEXP d_sep1,
-				      SEXP flow_field1,
-				      SEXP flow_field_width1) {
+                             SEXP y_start1,
+                             SEXP n_curves1,
+                             SEXP n_steps1,
+                             SEXP min_steps_allowed1,
+                             SEXP step_length1,
+                             SEXP d_sep1,
+                             SEXP flow_field1,
+                             SEXP flow_field_width1) {
 
 
   double x_start = as<double>(x_start1);
@@ -39,7 +36,7 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
   int flow_field_width = as<int>(flow_field_width1);
 
 
-	lefer::FlowField _flow_field = lefer::FlowField(flow_field, flow_field_width);
+  lefer::FlowField _flow_field = lefer::FlowField(flow_field, flow_field_width);
   lefer::DensityGrid density_grid = lefer::DensityGrid(
     flow_field_width, flow_field_width,
     d_sep,
@@ -47,67 +44,73 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
   );
 
 
-	std::vector<Curve> curves;
-	curves.reserve(n_curves);
-	double x = x_start;
-	double y = y_start;
-	int curve_array_index = 0;
-	int curve_id = 0;
-	lefer::Curve curve = draw_curve(
-		curve_id,
-		x, y,
-		n_steps,
-		step_length,
-		d_sep,
-		&_flow_field,
-		&density_grid
-	);
+  std::vector<lefer::Curve> curves;
+  curves.reserve(n_curves);
+  double x = x_start;
+  double y = y_start;
+  int curve_array_index = 0;
+  int curve_id = 0;
+  lefer::Curve curve = draw_curve(
+    curve_id,
+    x, y,
+    n_steps,
+    step_length,
+    d_sep,
+    &_flow_field,
+    &density_grid
+  );
 
-	curves.emplace_back(curve);
-	density_grid.insert_curve_coords(&curve);
-	curve_array_index++;
-
-
-	while (curve_id < n_curves && curve_array_index < n_curves) {
-		SeedPointsQueue queue = SeedPointsQueue(n_steps);
-		if (curve_id >= curves.size()) {
-			// There is no more curves to be analyzed in the queue
-			break;
-		}
-		queue = collect_seedpoints(&curves.at(curve_id), d_sep);
-		for (Point p: queue._points) {
-			// check if it is valid given the current state
-			if (density_grid.is_valid_next_step(p.x, p.y)) {
-				// if it is, draw the curve from it
-				Curve curve = draw_curve(
-					curve_array_index,
-					p.x, p.y,
-					n_steps,
-					step_length,
-					d_sep,
-					&_flow_field,
-					&density_grid
-				);
-
-				if (curve._steps_taken < min_steps_allowed) {
-					continue;
-				}
-
-				curves.emplace_back(curve);
-				// insert this new curve into the density grid
-				density_grid.insert_curve_coords(&curve);
-				curve_array_index++;
-			}
-		}
-
-		curve_id++;
-	}
+  curves.emplace_back(curve);
+  density_grid.insert_curve_coords(&curve);
+  curve_array_index++;
 
 
-	NumericVector __curves(5);
-	return __curves;
+  while (curve_id < n_curves && curve_array_index < n_curves) {
+    lefer::SeedPointsQueue queue = lefer::SeedPointsQueue(n_steps);
+    if (curve_id >= curves.size()) {
+      // There is no more curves to be analyzed in the queue
+      break;
+    }
+    queue = collect_seedpoints(&curves.at(curve_id), d_sep);
+    for (lefer::Point p: queue._points) {
+      // check if it is valid given the current state
+      if (density_grid.is_valid_next_step(p.x, p.y)) {
+        // if it is, draw the curve from it
+        lefer::Curve curve = draw_curve(
+          curve_array_index,
+          p.x, p.y,
+          n_steps,
+          step_length,
+          d_sep,
+          &_flow_field,
+          &density_grid
+        );
+
+        if (curve._steps_taken < min_steps_allowed) {
+          continue;
+        }
+
+        curves.emplace_back(curve);
+        // insert this new curve into the density grid
+        density_grid.insert_curve_coords(&curve);
+        curve_array_index++;
+      }
+    }
+
+    curve_id++;
+  }
+
+
+  NumericVector __curves(5);
+  return __curves;
 }
 
+
+
+
+namespace lefer {
+
+// Main APIs of the library ================================================================
 
 
 std::vector<lefer::Curve> non_overlapping_curves(std::vector<Point> starting_points,
