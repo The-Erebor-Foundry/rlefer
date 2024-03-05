@@ -7,9 +7,15 @@
 namespace lefer {
 
 
-
-
-
+RcppExport SEXP even_spaced_curves_impl(SEXP x_start1,
+                             SEXP y_start1,
+                             SEXP n_curves1,
+                             SEXP n_steps1,
+                             SEXP min_steps_allowed1,
+                             SEXP step_length1,
+                             SEXP d_sep1,
+                             SEXP flow_field1,
+                             SEXP flow_field_width1);
 
 
 double distance (double x1, double y1, double x2, double y2);

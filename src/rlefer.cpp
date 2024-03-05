@@ -17,7 +17,7 @@ namespace lefer {
 // Main APIs of the library ================================================================
 
 // [[Rcpp::export]]
-SEXP even_spaced_curves(SEXP x_start1,
+SEXP even_spaced_curves_impl(SEXP x_start1,
 				      SEXP y_start1,
 				      SEXP n_curves1,
 				      SEXP n_steps1,

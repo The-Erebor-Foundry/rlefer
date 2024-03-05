@@ -10,9 +10,9 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// even_spaced_curves
-SEXP even_spaced_curves(SEXP x_start1, SEXP y_start1, SEXP n_curves1, SEXP n_steps1, SEXP min_steps_allowed1, SEXP step_length1, SEXP d_sep1, SEXP flow_field1, SEXP flow_field_width1);
-RcppExport SEXP _rlefer_even_spaced_curves(SEXP x_start1SEXP, SEXP y_start1SEXP, SEXP n_curves1SEXP, SEXP n_steps1SEXP, SEXP min_steps_allowed1SEXP, SEXP step_length1SEXP, SEXP d_sep1SEXP, SEXP flow_field1SEXP, SEXP flow_field_width1SEXP) {
+// even_spaced_curves_impl
+SEXP even_spaced_curves_impl(SEXP x_start1, SEXP y_start1, SEXP n_curves1, SEXP n_steps1, SEXP min_steps_allowed1, SEXP step_length1, SEXP d_sep1, SEXP flow_field1, SEXP flow_field_width1);
+RcppExport SEXP _rlefer_even_spaced_curves_impl(SEXP x_start1SEXP, SEXP y_start1SEXP, SEXP n_curves1SEXP, SEXP n_steps1SEXP, SEXP min_steps_allowed1SEXP, SEXP step_length1SEXP, SEXP d_sep1SEXP, SEXP flow_field1SEXP, SEXP flow_field_width1SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -25,16 +25,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type d_sep1(d_sep1SEXP);
     Rcpp::traits::input_parameter< SEXP >::type flow_field1(flow_field1SEXP);
     Rcpp::traits::input_parameter< SEXP >::type flow_field_width1(flow_field_width1SEXP);
-    rcpp_result_gen = Rcpp::wrap(even_spaced_curves(x_start1, y_start1, n_curves1, n_steps1, min_steps_allowed1, step_length1, d_sep1, flow_field1, flow_field_width1));
+    rcpp_result_gen = Rcpp::wrap(even_spaced_curves_impl(x_start1, y_start1, n_curves1, n_steps1, min_steps_allowed1, step_length1, d_sep1, flow_field1, flow_field_width1));
     return rcpp_result_gen;
 END_RCPP
 }
 
-RcppExport SEXP even_spaced_curves(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-
 static const R_CallMethodDef CallEntries[] = {
-    {"_rlefer_even_spaced_curves", (DL_FUNC) &_rlefer_even_spaced_curves, 9},
-    {"even_spaced_curves", (DL_FUNC) &even_spaced_curves, 9},
+    {"_rlefer_even_spaced_curves_impl", (DL_FUNC) &_rlefer_even_spaced_curves_impl, 9},
     {NULL, NULL, 0}
 };
 

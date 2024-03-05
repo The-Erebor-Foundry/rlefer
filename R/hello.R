@@ -1,5 +1,5 @@
 
-Reven_spaced_curves <- function(x_start,
+even_spaced_curves <- function(x_start,
                                 y_start,
                                 n_curves,
                                 n_steps,
@@ -9,7 +9,7 @@ Reven_spaced_curves <- function(x_start,
                                 flow_field,
                                 flow_field_width) {
 
-  .Call("even_spaced_curves",
+  even_spaced_curves_impl(
         x_start,
         y_start,
         n_curves,
@@ -18,6 +18,6 @@ Reven_spaced_curves <- function(x_start,
         step_length,
         d_sep,
         flow_field,
-        flow_field_width,
-        PACKAGE = "rlefer")
+        flow_field_width
+  )
 }
