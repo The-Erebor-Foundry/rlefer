@@ -4,26 +4,40 @@
 // C++ STD Libraries
 #include <vector>
 
+#include "rlefer.h"
+
 // Rcpp header
 #include <Rcpp.h>
 
-#include "inst/include/rlefer.h"
+
+using namespace Rcpp;
 
 namespace lefer {
 
 // Main APIs of the library ================================================================
 
-
 // [[Rcpp::export]]
-std::vector<lefer::Curve> even_spaced_curves(double x_start,
-				      double y_start,
-				      int n_curves,
-				      int n_steps,
-				      int min_steps_allowed,
-				      double step_length,
-				      double d_sep,
-				      NumericMatrix flow_field,
-				      int flow_field_width) {
+SEXP even_spaced_curves(SEXP x_start1,
+				      SEXP y_start1,
+				      SEXP n_curves1,
+				      SEXP n_steps1,
+				      SEXP min_steps_allowed1,
+				      SEXP step_length1,
+				      SEXP d_sep1,
+				      SEXP flow_field1,
+				      SEXP flow_field_width1) {
+
+
+  double x_start = as<double>(x_start1);
+  double y_start = Rcpp::as<double>(y_start1);
+  int n_curves = as<int>(n_curves1);
+  int n_steps = as<int>(n_steps1);
+  int min_steps_allowed = as<int>(min_steps_allowed1);
+  double step_length = as<double>(step_length1);
+  double d_sep = as<double>(d_sep1);
+  NumericMatrix flow_field = as<NumericMatrix>(flow_field1);
+  int flow_field_width = as<int>(flow_field_width1);
+
 
 	lefer::FlowField _flow_field = lefer::FlowField(flow_field, flow_field_width);
   lefer::DensityGrid density_grid = lefer::DensityGrid(
@@ -90,8 +104,8 @@ std::vector<lefer::Curve> even_spaced_curves(double x_start,
 	}
 
 
-
-	return curves;
+	NumericVector __curves(5);
+	return __curves;
 }
 
 
@@ -101,7 +115,7 @@ std::vector<lefer::Curve> non_overlapping_curves(std::vector<Point> starting_poi
 					  int min_steps_allowed,
 					  double step_length,
 					  double d_sep,
-					  double** flow_field,
+					  NumericMatrix flow_field,
 					  int flow_field_width) {
 
   lefer::FlowField _flow_field = lefer::FlowField(flow_field, flow_field_width);
@@ -249,7 +263,7 @@ static int _grid_index_as_1d(int x, int y, int grid_width) {
 
 // FlowField class =======================================================
 
-FlowField::FlowField(double** flow_field, int field_width) {
+FlowField::FlowField(NumericMatrix flow_field, int field_width) {
 	_flow_field = flow_field;
 	_field_width = field_width;
 }
@@ -281,7 +295,7 @@ bool FlowField::off_boundaries(double x, double y) {
 double FlowField::get_angle(double x, double y) {
 	int xi = get_flow_field_col(x);
 	int yi = get_flow_field_row(y);
-	return _flow_field[xi][yi];
+	return _flow_field(xi, yi);
 }
 
 

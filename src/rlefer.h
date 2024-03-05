@@ -1,7 +1,16 @@
-#include <vector>
+#ifndef _RLEFER_HEADER_FILE_INCLUDE_
+#define _RLEFER_HEADER_FILE_INCLUDE_
 
+#include <vector>
+#include <Rcpp.h>
 
 namespace lefer {
+
+
+
+
+
+
 
 double distance (double x1, double y1, double x2, double y2);
 static int _grid_index_as_1d(int x, int y, int grid_width);
@@ -9,10 +18,10 @@ static int _grid_index_as_1d(int x, int y, int grid_width);
 
 class FlowField {
 private:
-	double** _flow_field;
+	Rcpp::NumericMatrix _flow_field;
 	int _field_width;
 public:
-	FlowField(double** flow_field, int field_width);
+	FlowField(Rcpp::NumericMatrix flow_field, int field_width);
 	int get_field_width();
 	int get_flow_field_col(double x);
 	int get_flow_field_row(double y);
@@ -27,12 +36,12 @@ struct Point {
 
 
 /** A class that represents a curve
-* 
+*
 */
 class Curve {
 public:
 	/** The id that identifies the curve */
-	int _curve_id; 
+	int _curve_id;
 	std::vector<double> _x; /** The x coordinates of each point in the curve */
 	std::vector<double> _y; /** The y coordinates of each point in the curve */
 	std::vector<int> _direction; /** The direction id of each point in the curve (0 means direction from left to right, 1 means direction from right to left) */
@@ -102,18 +111,6 @@ Curve draw_curve(int curve_id,
 		 DensityGrid* density_grid);
 
 
-std::vector<Curve> even_spaced_curves(double x_start,
-				      double y_start,
-				      int n_curves,
-				      int n_steps,
-				      int min_steps_allowed,
-				      double step_length,
-				      double d_sep,
-				      FlowField* flow_field,
-				      DensityGrid* density_grid);
-
-
-
 std::vector<Curve> non_overlapping_curves(std::vector<Point> starting_points,
 				      int n_steps,
 				      int min_steps_allowed,
@@ -125,3 +122,6 @@ std::vector<Curve> non_overlapping_curves(std::vector<Point> starting_points,
 
 
 } // namespace lefer
+
+
+#endif
