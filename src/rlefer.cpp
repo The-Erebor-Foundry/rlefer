@@ -65,11 +65,11 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
 
   while (curve_id < n_curves && curve_array_index < n_curves) {
     lefer::SeedPointsQueue queue = lefer::SeedPointsQueue(n_steps);
-    if (curve_id >= curves.size()) {
+    if (curve_id > curve_array_index) {
       // There is no more curves to be analyzed in the queue
       break;
     }
-    queue = collect_seedpoints(&curve, d_sep);
+    queue = lefer::collect_seedpoints(&curve, d_sep);
     for (lefer::Point p: queue._points) {
       // check if it is valid given the current state
       if (density_grid.is_valid_next_step(p.x, p.y)) {
