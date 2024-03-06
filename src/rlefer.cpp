@@ -35,7 +35,6 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
   NumericMatrix flow_field = as<NumericMatrix>(flow_field1);
   int flow_field_width = as<int>(flow_field_width1);
 
-
   lefer::FlowField _flow_field = lefer::FlowField(flow_field, flow_field_width);
   lefer::DensityGrid density_grid = lefer::DensityGrid(
     flow_field_width, flow_field_width,
@@ -44,14 +43,11 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
   );
 
 
-  std::vector<lefer::Curve> curves;
-  curves.reserve(n_curves);
+  List curves(n_curves);
   double x = x_start;
   double y = y_start;
-  int curve_array_index = 0;
-  int curve_id = 0;
-  lefer::Curve curve = draw_curve(
-    curve_id,
+  List curve = draw_curve(
+    0,
     x, y,
     n_steps,
     step_length,
@@ -59,9 +55,11 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
     &_flow_field,
     &density_grid
   );
+  curves[0] = curve;
 
-  curves.emplace_back(curve);
-  density_grid.insert_curve_coords(&curve);
+  int curve_array_index = 1;
+  int curve_id = 1;
+  density_grid.insert_list_coords(&curve);
   curve_array_index++;
 
 
@@ -71,12 +69,12 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
       // There is no more curves to be analyzed in the queue
       break;
     }
-    queue = collect_seedpoints(&curves.at(curve_id), d_sep);
+    queue = collect_seedpoints(&curve, d_sep);
     for (lefer::Point p: queue._points) {
       // check if it is valid given the current state
       if (density_grid.is_valid_next_step(p.x, p.y)) {
         // if it is, draw the curve from it
-        lefer::Curve curve = draw_curve(
+        curve = draw_curve(
           curve_array_index,
           p.x, p.y,
           n_steps,
@@ -86,13 +84,13 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
           &density_grid
         );
 
-        if (curve._steps_taken < min_steps_allowed) {
+        if (as<int>(curve[1]) < min_steps_allowed) {
           continue;
         }
 
-        curves.emplace_back(curve);
+        curves[curve_array_index] = curve;
         // insert this new curve into the density grid
-        density_grid.insert_curve_coords(&curve);
+        density_grid.insert_list_coords(&curve);
         curve_array_index++;
       }
     }
@@ -110,64 +108,8 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
 
 namespace lefer {
 
-// Main APIs of the library ================================================================
 
-
-std::vector<lefer::Curve> non_overlapping_curves(std::vector<Point> starting_points,
-					  int n_steps,
-					  int min_steps_allowed,
-					  double step_length,
-					  double d_sep,
-					  NumericMatrix flow_field,
-					  int flow_field_width) {
-
-  lefer::FlowField _flow_field = lefer::FlowField(flow_field, flow_field_width);
-  lefer::DensityGrid density_grid = lefer::DensityGrid(
-    flow_field_width, flow_field_width,
-    d_sep,
-    2000
-  );
-
-	std::vector<Curve> curves;
-	curves.reserve(starting_points.size());
-	int curve_id = 0;
-	for (Point start_point: starting_points) {
-		double x_start = start_point.x;
-		double y_start = start_point.y;
-		// Check if this starting point is valid given the current state
-		if (density_grid.is_valid_next_step(x_start, y_start)) {
-			// if it is, draw the curve from it
-			Curve curve = draw_curve(
-				curve_id,
-				x_start, y_start,
-				n_steps,
-				step_length,
-				d_sep,
-				&_flow_field,
-				&density_grid
-			);
-
-			if (curve._steps_taken < min_steps_allowed) {
-				continue;
-			}
-
-			curves.emplace_back(curve);
-			// insert this new curve into the density grid
-			density_grid.insert_curve_coords(&curve);
-			curve_id++;
-		}
-	}
-
-
-	return curves;
-}
-
-
-
-
-
-
-Curve draw_curve(int curve_id,
+List draw_curve(int curve_id,
                  double x_start,
                  double y_start,
                  int n_steps,
@@ -176,13 +118,23 @@ Curve draw_curve(int curve_id,
                  FlowField* flow_field,
                  DensityGrid* density_grid) {
 
-  Curve curve = Curve(curve_id, n_steps);
-  curve.insert_step(x_start, y_start, 0);
+  IntegerVector _curve_id = curve_id;
+  IntegerVector direction_ids(n_steps);
+  IntegerVector step_ids(n_steps);
+  NumericVector x_coords(n_steps);
+  NumericVector y_coords(n_steps);
+
   double x = x_start;
   double y = y_start;
-  int i = 1;
+  direction_ids[0] = 0;
+  step_ids[0] = 0;
+  x_coords[0] = x_start;
+  y_coords[0] = y_start;
+
+  int array_index = 1;
+  int steps_taken = 1;
   // Draw curve from right to left
-  while (i < (n_steps / 2)) {
+  while (steps_taken < (n_steps / 2)) {
     if (flow_field->off_boundaries(x, y)) {
       break;
     }
@@ -197,14 +149,17 @@ Curve draw_curve(int curve_id,
       break;
     }
 
-    curve.insert_step(x, y, 0);
-    i++;
+    direction_ids[array_index] = 0;
+    step_ids[array_index] = array_index;
+    x_coords[array_index] = x;
+    y_coords[array_index] = y;
+    steps_taken++; array_index++;
   }
 
   x = x_start;
   y = y_start;
   // Draw curve from left to right
-  while (i < n_steps) {
+  while (steps_taken < n_steps) {
     if (flow_field->off_boundaries(x, y)) {
       break;
     }
@@ -219,9 +174,21 @@ Curve draw_curve(int curve_id,
       break;
     }
 
-    curve.insert_step(x, y, 1);
-    i++;
+    direction_ids[array_index] = 1;
+    step_ids[array_index] = array_index;
+    x_coords[array_index] = x;
+    y_coords[array_index] = y;
+    steps_taken++; array_index++;
   }
+
+  List curve = List::create(
+    Rcpp::Named("curve_id") = _curve_id,
+    Rcpp::Named("steps_taken") = steps_taken,
+    Rcpp::Named("x") = x_coords,
+    Rcpp::Named("y") = y_coords,
+    Rcpp::Named("step_id") = step_ids,
+    Rcpp::Named("direction_id") = direction_ids
+  );
 
   return curve;
 }
@@ -406,6 +373,15 @@ void DensityGrid::insert_coord(double x, double y) {
 	}
 }
 
+
+void DensityGrid::insert_list_coords(List* curve) {
+  int steps_taken = as<int>(curve[1]);
+  for (int i = 0; i < steps_taken; i++) {
+    insert_coord(curve[2][i], curve[3][i]);
+  }
+}
+
+
 void DensityGrid::insert_curve_coords(Curve* curve) {
 	int steps_taken = curve->_steps_taken;
 	for (int i = 0; i < steps_taken; i++) {
@@ -492,20 +468,22 @@ void SeedPointsQueue::insert_point(Point p) {
 
 
 
-SeedPointsQueue collect_seedpoints (Curve* curve, double d_sep) {
-	int steps_taken = curve->_steps_taken;
+SeedPointsQueue collect_seedpoints (List* curve, double d_sep) {
+	int steps_taken = as<int>(curve[1]);
 	SeedPointsQueue queue = SeedPointsQueue(steps_taken);
 	if (steps_taken == 0) {
 		return queue;
 	}
 
 	for (int i = 0; i < steps_taken - 1; i++) {
-		double x = curve->_x.at(i);
-		double y = curve->_y.at(i);
+		double x = as<double>(curve[2][i]);
+	  double next_x = as<double>(curve[2][i + 1]);
+		double y = as<double>(curve[3][i]);
+		double next_y = as<double>(curve[3][i + 1]);
 
 		int ff_column_index = (int) floor(x);
 		int ff_row_index = (int) floor(y);
-		double angle = atan2(curve->_y.at(i + 1) - y, curve->_x.at(i + 1) - x);
+		double angle = atan2(next_y - y, next_x - x);
 
 		double angle_left = angle + (M_PI / 2);
 		double angle_right = angle - (M_PI / 2);

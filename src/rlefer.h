@@ -30,18 +30,15 @@ struct Point {
 };
 
 
-/** A class that represents a curve
-*
-*/
+
 class Curve {
 public:
-	/** The id that identifies the curve */
 	int _curve_id;
-	std::vector<double> _x; /** The x coordinates of each point in the curve */
-	std::vector<double> _y; /** The y coordinates of each point in the curve */
-	std::vector<int> _direction; /** The direction id of each point in the curve (0 means direction from left to right, 1 means direction from right to left) */
-	std::vector<int> _step_id; /** The id (or the number) of the step for each point in the curve */
-	int _steps_taken; /** The number of steps taken to draw the curve. */
+	std::vector<double> _x;
+	std::vector<double> _y;
+	std::vector<int> _direction;
+	std::vector<int> _step_id;
+	int _steps_taken;
 public:
 	Curve(int id, int n_steps);
 	void insert_step(double x_coord, double y_coord, int direction_id);
@@ -71,6 +68,7 @@ public:
 	int get_density_index (int col, int row);
 	bool off_boundaries(double x, double y);
 	void insert_coord(double x, double y);
+	void insert_list_coords(Rcpp::List* curve);
 	void insert_curve_coords(Curve* curve);
 	bool is_valid_next_step(double x, double y);
 };
@@ -92,27 +90,19 @@ public:
 
 
 
-SeedPointsQueue collect_seedpoints (Curve* curve, double d_sep);
+SeedPointsQueue collect_seedpoints (Rcpp::List* curve, double d_sep);
 
 
 
-Curve draw_curve(int curve_id,
-		 double x_start,
-		 double y_start,
-		 int n_steps,
-		 double step_length,
-		 double d_sep,
-		 FlowField* flow_field,
-		 DensityGrid* density_grid);
+Rcpp::List draw_curve(int curve_id,
+                double x_start,
+                double y_start,
+                int n_steps,
+                double step_length,
+                double d_sep,
+                FlowField* flow_field,
+                DensityGrid* density_grid);
 
-
-std::vector<Curve> non_overlapping_curves(std::vector<Point> starting_points,
-				      int n_steps,
-				      int min_steps_allowed,
-				      double step_length,
-				      double d_sep,
-				      FlowField* flow_field,
-				      DensityGrid* density_grid);
 
 
 
