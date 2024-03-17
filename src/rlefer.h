@@ -8,7 +8,6 @@ namespace lefer {
 
 
 double distance (double x1, double y1, double x2, double y2);
-static int _grid_index_as_1d(int x, int y, int grid_width);
 
 
 class FlowField {

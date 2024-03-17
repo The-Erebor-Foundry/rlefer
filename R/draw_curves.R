@@ -1,5 +1,5 @@
 
-
+utils::globalVariables(".data")
 
 #' Draws multiple evenly-spaced and non-overlapping curves in a flow field.
 #'
@@ -86,6 +86,7 @@
 #'   0.5,
 #'   flow_field
 #' )
+#' @export
 even_spaced_curves <- function(x_start,
                                 y_start,
                                 n_curves,
@@ -111,12 +112,12 @@ even_spaced_curves <- function(x_start,
   df |>
     tibble::as_tibble() |>
     dplyr::filter(
-      curve_id > 0,
-      x > 0,
-      y > 0,
-      steps_taken > 0,
-      step_ids > 0,
-      direction_id > 0,
+      .data$curve_id > 0,
+      .data$x > 0,
+      .data$y > 0,
+      .data$steps_taken > 0,
+      .data$step_ids > 0,
+      .data$direction_id > 0,
     )
 }
 
@@ -225,6 +226,7 @@ even_spaced_curves <- function(x_start,
 #'   0.5,
 #'   flow_field
 #' )
+#' @export
 
 non_overlapping_curves <- function(starting_points,
                                n_steps,
@@ -249,11 +251,11 @@ non_overlapping_curves <- function(starting_points,
   df |>
     tibble::as_tibble() |>
     dplyr::filter(
-      curve_id > 0,
-      x > 0,
-      y > 0,
-      steps_taken > 0,
-      step_ids > 0,
-      direction_id > 0,
+      .data$curve_id > 0,
+      .data$x > 0,
+      .data$y > 0,
+      .data$steps_taken > 0,
+      .data$step_ids > 0,
+      .data$direction_id > 0,
     )
 }

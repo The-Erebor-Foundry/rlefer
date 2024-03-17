@@ -251,9 +251,6 @@ double distance (double x1, double y1, double x2, double y2) {
 	return sqrt(s1 + s2);
 }
 
-static int _grid_index_as_1d(int x, int y, int grid_width) {
-	return x + grid_width * y;
-}
 
 DataFrame _curves_as_df(std::vector<lefer::Curve> &curves, int n_steps) {
   int n_curves = curves.size();
@@ -538,9 +535,6 @@ SeedPointsQueue collect_seedpoints (Curve* curve, double d_sep) {
 	for (int i = 0; i < steps_taken - 1; i++) {
 		double x = curve->_x.at(i);
 		double y = curve->_y.at(i);
-
-		int ff_column_index = (int) floor(x);
-		int ff_row_index = (int) floor(y);
 		double angle = atan2(curve->_y.at(i + 1) - y, curve->_x.at(i + 1) - x);
 
 		double angle_left = angle + (M_PI / 2);

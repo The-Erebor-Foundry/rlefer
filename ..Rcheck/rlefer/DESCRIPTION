@@ -7,13 +7,8 @@ Author: Pedro Duarte Faria
 Maintainer: Pedro Duarte Faria <pedropark99@gmail.com>
 Description: R package to draw evenly-spaced and non-overlapping curves in a flow field, using the Jobard and Lefer (1997) algorithm.
 License: MIT + file LICENSE
-Encoding: UTF-8
-Imports: 
-    dplyr,
-    Rcpp (>= 1.0.12),
-    tibble,
-    utils
-Suggests:
-    ambient
+Imports: dplyr, Rcpp (>= 1.0.12), rlang, tibble
 LinkingTo: Rcpp
 RoxygenNote: 7.2.3
+Built: R 4.3.1; x86_64-w64-mingw32; 2024-03-17 17:52:50 UTC; windows
+Archs: x64

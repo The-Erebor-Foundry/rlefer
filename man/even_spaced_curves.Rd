@@ -57,8 +57,16 @@ and it starts to draw a initial curve in the flow field. After that, the functio
 to draw \code{n_curves - 1} curves from this initial curve. In other words, all the curves that are drawn
 into the flow field are derived from this initial curve.
 
+Is
+worth noting that each starting point
+represents the "middle point" of the curve, because the function draws a curve
+in both directions. That is why we have the \code{direction_id} column in the
+output of this function. It indicates what direction the function was
+following when drawing the current section (or "step") of the current
+curve.
+
 In each step of the way, the function will check if the current curve that is being
-drawn is too close to it's, by calculating it's distance to the existing curves
+drawn is too close to it's neighbors, by calculating it's distance to the existing curves
 around it. If the current curve is getting too close to a neighbor curve, then,
 the function will stop drawing the current curve, and will start to draw the
 next curve in the queue.
@@ -94,7 +102,6 @@ curves <- even_spaced_curves(
   0.5,
   flow_field
 )
-
 }
 \references{
 Jobard, Bruno, and Wilfrid Lefer. 1997. “Creating Evenly-Spaced Streamlines of Arbitrary Density.” In Visualization in Scientific Computing ’97, edited by Wilfrid Lefer and Michel Grave, 43–55. Vienna: Springer Vienna.

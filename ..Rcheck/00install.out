@@ -1,0 +1,18 @@
+* installing *source* package 'rlefer' ...
+** using staged installation
+** libs
+using C++ compiler: 'G__~1.EXE (Rev7, Built by MSYS2 project) 13.1.0'
+using C++11
+make: Nothing to be done for 'all'.
+make: 'symbols.rds' is up to date.
+installing to C:/Users/pedro/Documents/Projetos/Packages/rlefer/..Rcheck/00LOCK-rlefer/00new/rlefer/libs/x64
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (rlefer)

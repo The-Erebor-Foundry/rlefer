@@ -41,11 +41,74 @@ This function returns a \code{tibble} object with 6 columns:
 Draws multiple non-overlapping curves in a flow field,
 using the Jobard and Lefer (1997) algorithm.
 }
+\details{
+If you want to draw curves that are not only "non-overlapping",
+but also, that are "evenly-spaced" between each other, you should
+use the \code{even_spaced_curves()} function instead.
+But if you care only if the curves are non-overlapping
+between each other, then, this function is for you.
+
+You can use this function to draw multiple curves in a flow field.
+Each curve will be non-overlapping between it's
+neighbors.
+
+In essence, this function takes list of starting points for each curve you want to draw.
+The function will attempt to draw a curve from each starting point.
+
+Is
+worth noting that each starting point
+represents the "middle point" of the curve, because the function draws a curve
+in both directions. That is why we have the \code{direction_id} column in the
+output of this function. It indicates what direction the function was
+following when drawing the current section (or "step") of the current
+curve.
+
+In each step of the way, the function will check if the current curve that is being
+drawn is too close to it's neighbors, by calculating it's distance to the existing curves
+around it. If the current curve is getting too close to a neighbor curve, then,
+the function will stop drawing the current curve, and will start to draw the
+next curve in the queue.
+
+If the function starts to draw a new curve, but the starting point of this new curve is already
+too close to other existing curves, then, the function completely drops this curve (i.e.
+it "gives up" on drawing this curve), and jumps to the next curve in the queue.
+
+Also, if the function draws a new curve, but this curve have less than
+\code{min_allowed_steps} steps, then, this curve is also completely dropped.
+This avoids getting a high number of curves that are too short.
+
+In other words, it is not guaranteed that this function will draw exactly \code{n_curves} curves
+into the field, because, it might not have enough space for \code{n_curves} curves, considering your current settings.
+So, the function
+will attempt to draw as many curves as possible. As long as they are not overlapping
+each other, and they are not too close to other neighbouring curves, the function will
+continue to draw curves into the field.
+
+For more details about how the algorithm works, check: \url{https://pedro-faria.netlify.app/posts/2024/2024-02-19-flow-even/en/}
+}
 \examples{
 library(ambient)
 set.seed(50)
 flow_field <- noise_perlin(c(240, 240))
+set.seed(80)
+xs <- runif(100)
+set.seed(90)
+ys <- runif(100)
+xs <- xs * 240
+ys <- ys * 240
+starting_points <- list()
+for(i in seq_len(100)) {
+  starting_points[[i]] <- list(x = xs[i], y = ys[i])
+}
 
+curves <- non_overlapping_curves(
+  starting_points,
+  30,
+  5,
+  0.01*240,
+  0.5,
+  flow_field
+)
 }
 \references{
 Jobard, Bruno, and Wilfrid Lefer. 1997. “Creating Evenly-Spaced Streamlines of Arbitrary Density.” In Visualization in Scientific Computing ’97, edited by Wilfrid Lefer and Michel Grave, 43–55. Vienna: Springer Vienna.
