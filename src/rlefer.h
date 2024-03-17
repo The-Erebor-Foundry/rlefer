@@ -106,15 +106,6 @@ Curve draw_curve(int curve_id,
 		 DensityGrid* density_grid);
 
 
-std::vector<Curve> non_overlapping_curves(std::vector<Point> starting_points,
-				      int n_steps,
-				      int min_steps_allowed,
-				      double step_length,
-				      double d_sep,
-				      FlowField* flow_field,
-				      DensityGrid* density_grid);
-
-
 
 } // namespace lefer
 

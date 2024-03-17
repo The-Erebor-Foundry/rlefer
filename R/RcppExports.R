@@ -5,3 +5,7 @@ even_spaced_curves_impl <- function(x_start1, y_start1, n_curves1, n_steps1, min
     .Call(`_rlefer_even_spaced_curves_impl`, x_start1, y_start1, n_curves1, n_steps1, min_steps_allowed1, step_length1, d_sep1, flow_field1, flow_field_width1)
 }
 
+non_overlapping_curves_impl <- function(starting_points, n_curves, n_steps, min_steps_allowed, step_length, d_sep, flow_field, flow_field_width) {
+    .Call(`_rlefer_non_overlapping_curves_impl`, starting_points, n_curves, n_steps, min_steps_allowed, step_length, d_sep, flow_field, flow_field_width)
+}
+

@@ -26,7 +26,7 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
 
 
   double x_start = as<double>(x_start1);
-  double y_start = Rcpp::as<double>(y_start1);
+  double y_start = as<double>(y_start1);
   int n_curves = as<int>(n_curves1);
   int n_steps = as<int>(n_steps1);
   int min_steps_allowed = as<int>(min_steps_allowed1);
@@ -106,21 +106,15 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
 
 
 
-
-
-
-namespace lefer {
-
-// Main APIs of the library ================================================================
-
-
-std::vector<lefer::Curve> non_overlapping_curves(std::vector<Point> starting_points,
-					  int n_steps,
-					  int min_steps_allowed,
-					  double step_length,
-					  double d_sep,
-					  NumericMatrix flow_field,
-					  int flow_field_width) {
+// [[Rcpp::export]]
+DataFrame non_overlapping_curves_impl(List starting_points,
+                                      int n_curves,
+                                      int n_steps,
+                                      int min_steps_allowed,
+                                      double step_length,
+                                      double d_sep,
+                                      NumericMatrix flow_field,
+                                      int flow_field_width) {
 
   lefer::FlowField _flow_field = lefer::FlowField(flow_field, flow_field_width);
   lefer::DensityGrid density_grid = lefer::DensityGrid(
@@ -129,43 +123,50 @@ std::vector<lefer::Curve> non_overlapping_curves(std::vector<Point> starting_poi
     2000
   );
 
-	std::vector<Curve> curves;
-	curves.reserve(starting_points.size());
-	int curve_id = 0;
-	for (Point start_point: starting_points) {
-		double x_start = start_point.x;
-		double y_start = start_point.y;
-		// Check if this starting point is valid given the current state
-		if (density_grid.is_valid_next_step(x_start, y_start)) {
-			// if it is, draw the curve from it
-			Curve curve = draw_curve(
-				curve_id,
-				x_start, y_start,
-				n_steps,
-				step_length,
-				d_sep,
-				&_flow_field,
-				&density_grid
-			);
 
-			if (curve._steps_taken < min_steps_allowed) {
-				continue;
-			}
+  std::vector<lefer::Curve> curves;
+  curves.reserve(n_curves);
+  int curve_id = 0;
+  List::iterator it = starting_points.begin();
+  for (; it != starting_points.end(); it++) {
+    List point = *it;
+    double x_start = as<double>(point["x"]);
+    double y_start = as<double>(point["y"]);
+    // Check if this starting point is valid given the current state
+    if (density_grid.is_valid_next_step(x_start, y_start)) {
+      // if it is, draw the curve from it
+      lefer::Curve curve = draw_curve(
+        curve_id,
+        x_start, y_start,
+        n_steps,
+        step_length,
+        d_sep,
+        &_flow_field,
+        &density_grid
+      );
 
-			curves.emplace_back(curve);
-			// insert this new curve into the density grid
-			density_grid.insert_curve_coords(&curve);
-			curve_id++;
-		}
-	}
+      if (curve._steps_taken < min_steps_allowed) {
+        continue;
+      }
+
+      curves.emplace_back(curve);
+      // insert this new curve into the density grid
+      density_grid.insert_curve_coords(&curve);
+      curve_id++;
+    }
+  }
 
 
-	return curves;
+  return lefer::_curves_as_df(curves, n_steps);
 }
 
 
 
 
+
+
+
+namespace lefer {
 
 
 Curve draw_curve(int curve_id,

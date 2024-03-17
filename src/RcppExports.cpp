@@ -29,9 +29,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// non_overlapping_curves_impl
+DataFrame non_overlapping_curves_impl(List starting_points, int n_curves, int n_steps, int min_steps_allowed, double step_length, double d_sep, NumericMatrix flow_field, int flow_field_width);
+RcppExport SEXP _rlefer_non_overlapping_curves_impl(SEXP starting_pointsSEXP, SEXP n_curvesSEXP, SEXP n_stepsSEXP, SEXP min_steps_allowedSEXP, SEXP step_lengthSEXP, SEXP d_sepSEXP, SEXP flow_fieldSEXP, SEXP flow_field_widthSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type starting_points(starting_pointsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_curves(n_curvesSEXP);
+    Rcpp::traits::input_parameter< int >::type n_steps(n_stepsSEXP);
+    Rcpp::traits::input_parameter< int >::type min_steps_allowed(min_steps_allowedSEXP);
+    Rcpp::traits::input_parameter< double >::type step_length(step_lengthSEXP);
+    Rcpp::traits::input_parameter< double >::type d_sep(d_sepSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type flow_field(flow_fieldSEXP);
+    Rcpp::traits::input_parameter< int >::type flow_field_width(flow_field_widthSEXP);
+    rcpp_result_gen = Rcpp::wrap(non_overlapping_curves_impl(starting_points, n_curves, n_steps, min_steps_allowed, step_length, d_sep, flow_field, flow_field_width));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rlefer_even_spaced_curves_impl", (DL_FUNC) &_rlefer_even_spaced_curves_impl, 9},
+    {"_rlefer_non_overlapping_curves_impl", (DL_FUNC) &_rlefer_non_overlapping_curves_impl, 8},
     {NULL, NULL, 0}
 };
 
