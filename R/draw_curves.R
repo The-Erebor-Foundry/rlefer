@@ -1,5 +1,5 @@
-
 utils::globalVariables(".data")
+
 
 #' Draws multiple evenly-spaced and non-overlapping curves in a flow field.
 #'
@@ -109,13 +109,26 @@ even_spaced_curves <- function(x_start,
     flow_field_width
   )
 
-  df |>
+  usable_obs <- df |>
     tibble::as_tibble() |>
+    dplyr::mutate(
+      curve_id = as.integer(.data$curve_id),
+      direction_id = as.integer(.data$direction_id),
+      steps_taken = as.integer(.data$steps_taken)
+    ) |>
     dplyr::filter(
       .data$x > 0,
       .data$y > 0,
       .data$steps_taken > 0
     )
+
+  usable_obs |>
+    dplyr::group_by(.data$curve_id, .data$direction_id) |>
+    dplyr::mutate(
+      point_order = point_order(.data$direction_id)
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::arrange(.data$curve_id, .data$direction_id, .data$point_order)
 }
 
 
@@ -245,11 +258,46 @@ non_overlapping_curves <- function(starting_points,
     flow_field_width
   )
 
-  df |>
+  usable_obs <- df |>
     tibble::as_tibble() |>
+    dplyr::mutate(
+      curve_id = as.integer(.data$curve_id),
+      direction_id = as.integer(.data$direction_id),
+      steps_taken = as.integer(.data$steps_taken)
+    ) |>
     dplyr::filter(
       .data$x > 0,
       .data$y > 0,
       .data$steps_taken > 0
     )
+
+  usable_obs |>
+    dplyr::group_by(.data$curve_id, .data$direction_id) |>
+    dplyr::mutate(
+      point_order = point_order(.data$direction_id)
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::arrange(.data$curve_id, .data$direction_id, .data$point_order)
+}
+
+
+
+
+
+
+#' Get order ID of each point in the curve
+#'
+#' @description
+#' Helper function to get the order ID of each point
+#' in the curve.
+#'
+#' @param direction_id a integer vector with direction IDs.
+#'
+#' @keywords internal
+point_order <- function(direction_id) {
+  n <- length(direction_id)
+  if (direction_id[1L] == 1L) {
+    return(seq_len(n))
+  }
+  return(rev(seq_len(n)))
 }
