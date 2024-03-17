@@ -17,6 +17,14 @@
 #' to draw \code{n_curves - 1} curves from this initial curve. In other words, all the curves that are drawn
 #' into the flow field are derived from this initial curve.
 #'
+#' Is
+#' worth noting that each starting point
+#' represents the "middle point" of the curve, because the function draws a curve
+#' in both directions. That is why we have the \code{direction_id} column in the
+#' output of this function. It indicates what direction the function was
+#' following when drawing the current section (or "step") of the current
+#' curve.
+#'
 #' In each step of the way, the function will check if the current curve that is being
 #' drawn is too close to it's neighbors, by calculating it's distance to the existing curves
 #' around it. If the current curve is getting too close to a neighbor curve, then,
@@ -146,9 +154,15 @@ even_spaced_curves <- function(x_start,
 #' neighbors.
 #'
 #' In essence, this function takes list of starting points for each curve you want to draw.
-#' The function will attempt to draw a curve from each starting point. Each starting point
+#' The function will attempt to draw a curve from each starting point.
+#'
+#' Is
+#' worth noting that each starting point
 #' represents the "middle point" of the curve, because the function draws a curve
-#' in both directions.
+#' in both directions. That is why we have the \code{direction_id} column in the
+#' output of this function. It indicates what direction the function was
+#' following when drawing the current section (or "step") of the current
+#' curve.
 #'
 #' In each step of the way, the function will check if the current curve that is being
 #' drawn is too close to it's neighbors, by calculating it's distance to the existing curves
