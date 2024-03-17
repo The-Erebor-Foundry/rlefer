@@ -112,12 +112,9 @@ even_spaced_curves <- function(x_start,
   df |>
     tibble::as_tibble() |>
     dplyr::filter(
-      .data$curve_id > 0,
       .data$x > 0,
       .data$y > 0,
-      .data$steps_taken > 0,
-      .data$step_ids > 0,
-      .data$direction_id > 0,
+      .data$steps_taken > 0
     )
 }
 
@@ -251,11 +248,8 @@ non_overlapping_curves <- function(starting_points,
   df |>
     tibble::as_tibble() |>
     dplyr::filter(
-      .data$curve_id > 0,
       .data$x > 0,
       .data$y > 0,
-      .data$steps_taken > 0,
-      .data$step_ids > 0,
-      .data$direction_id > 0,
+      .data$steps_taken > 0
     )
 }
