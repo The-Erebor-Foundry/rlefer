@@ -6,3 +6,4 @@
 *.dll
 *.so
 *.rds
+inst/doc

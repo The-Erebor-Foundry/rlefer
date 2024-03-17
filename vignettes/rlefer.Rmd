@@ -1,0 +1,54 @@
+---
+title: "rlefer"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{rlefer}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+```{r setup}
+library(rlefer)
+library(ambient)
+library(ggplot2)
+
+flow_field_width <- 120
+step_length <- 0.01 * flow_field_width
+d_sep <- 0.01 * flow_field_width
+
+set.seed(50)
+flow_field <- noise_perlin(c(flow_field_width, flow_field_width))
+flow_field <- flow_field * 2 * pi
+# The coordinates x = 45 and y = 24 are used as the starting point:
+curves <- even_spaced_curves(
+  45, 24,
+  300,
+  80,
+  10,
+  step_length,
+  d_sep,
+  flow_field
+)
+
+
+ggplot(curves) +
+  geom_path(
+    aes(x, y, group = curve_id)
+  ) +
+  coord_cartesian(
+    xlim = c(0, flow_field_width),
+    ylim = c(0, flow_field_width)
+  ) +
+  theme_void()
+```
+
+
