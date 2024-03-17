@@ -1,11 +1,11 @@
 Package: rlefer
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
+Title: Draw evenly-spaced and non-overlapping curves in a flow field.
 Version: 1.0
 Date: 2024-03-05
 Author: Pedro Duarte Faria
 Maintainer: Pedro Duarte Faria <pedropark99@gmail.com>
-Description: One paragraph description of what the package does as one or more full sentences.
+Description: R package to draw evenly-spaced and non-overlapping curves in a flow field, using the Jobard and Lefer (1997) algorithm.
 License: MIT + file LICENSE
 Imports: 
     dplyr,

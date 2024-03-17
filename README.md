@@ -1,7 +1,8 @@
 # rlefer
 
-R package to draw non-overlapping and evenly-spaced curves in a flow field (i.e. vector field)
-using the Jobard and Lefer (1997) algorithm. This algorithm is thoroughly described in a scientific paper (Jobard and Lefer 1997), but you might [find this article useful too](https://pedro-faria.netlify.app/posts/2024/2024-02-19-flow-even/en/index.html).
+`rlefer` is a R package that provides an interface to the Jobard and Lefer (1997) algorithm
+implemented in C++. This algorithm can be used to draw non-overlapping and evenly-spaced curves in a flow field (i.e. vector field).
+This algorithm is thoroughly described in a scientific paper (Jobard and Lefer 1997), but you might [find this article useful too](https://pedro-faria.netlify.app/posts/2024/2024-02-19-flow-even/en/index.html).
 
 ![](./man/figures/even_curves2.png)
 
@@ -67,7 +68,7 @@ curves <- even_spaced_curves(
 curves
 ```
 
-```r
+```
 # A tibble: 960 × 6
    curve_id steps_taken     x     y direction_id step_ids
       <dbl>       <dbl> <dbl> <dbl>        <dbl>    <dbl>

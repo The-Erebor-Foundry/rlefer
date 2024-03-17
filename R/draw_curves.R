@@ -68,9 +68,12 @@
 #' \item{\code{steps_taken}: the number of steps taken to draw the current curve.}
 #' }
 #'
+#' @references
+#' Jobard, Bruno, and Wilfrid Lefer. 1997. “Creating Evenly-Spaced Streamlines of Arbitrary Density.” In Visualization in Scientific Computing ’97, edited by Wilfrid Lefer and Michel Grave, 43–55. Vienna: Springer Vienna.
+#'
+#'
 #' @examples
 #' library(ambient)
-#' library(rlefer)
 #' set.seed(50)
 #' flow_field <- noise_perlin(c(240, 240))
 #' # The coordinates x = 45 and y = 24 are used as the starting point:
@@ -83,10 +86,6 @@
 #'   0.5,
 #'   flow_field
 #' )
-#'
-#' @references
-#' Jobard, Bruno, and Wilfrid Lefer. 1997. “Creating Evenly-Spaced Streamlines of Arbitrary Density.” In Visualization in Scientific Computing ’97, edited by Wilfrid Lefer and Michel Grave, 43–55. Vienna: Springer Vienna.
-#'
 even_spaced_curves <- function(x_start,
                                 y_start,
                                 n_curves,
@@ -200,34 +199,33 @@ even_spaced_curves <- function(x_start,
 #' \item{\code{steps_taken}: the number of steps taken to draw the current curve.}
 #' }
 #'
-#' @examples
-#' library(ambient)
-#' library(rlefer)
-#' set.seed(50)
-#' flow_field <- noise_perlin(c(240, 240))
-# set.seed(80)
-# xs <- runif(100)
-# set.seed(90)
-# ys <- runif(100)
-# xs <- xs * 240
-# ys <- ys * 240
-# starting_points <- list()
-# for(i in seq_len(100)) {
-#   starting_points[[i]] <- list(x = xs[i], y = ys[i])
-# }
-#
-# curves <- non_overlapping_curves(
-#   starting_points,
-#   30,
-#   5,
-#   0.01*240,
-#   0.5,
-#   flow_field
-# )
-#'
 #' @references
 #' Jobard, Bruno, and Wilfrid Lefer. 1997. “Creating Evenly-Spaced Streamlines of Arbitrary Density.” In Visualization in Scientific Computing ’97, edited by Wilfrid Lefer and Michel Grave, 43–55. Vienna: Springer Vienna.
 #'
+#' @examples
+#' library(ambient)
+#' set.seed(50)
+#' flow_field <- noise_perlin(c(240, 240))
+#' set.seed(80)
+#' xs <- runif(100)
+#' set.seed(90)
+#' ys <- runif(100)
+#' xs <- xs * 240
+#' ys <- ys * 240
+#' starting_points <- list()
+#' for(i in seq_len(100)) {
+#'   starting_points[[i]] <- list(x = xs[i], y = ys[i])
+#' }
+#'
+#' curves <- non_overlapping_curves(
+#'   starting_points,
+#'   30,
+#'   5,
+#'   0.01*240,
+#'   0.5,
+#'   flow_field
+#' )
+
 non_overlapping_curves <- function(starting_points,
                                n_steps,
                                min_steps_allowed,
