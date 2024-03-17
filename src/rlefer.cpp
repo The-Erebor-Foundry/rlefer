@@ -101,9 +101,10 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
   }
 
 
-  NumericVector __curves(5);
-  return __curves;
+  return lefer::_curves_as_df(curves, n_steps);
 }
+
+
 
 
 
@@ -253,6 +254,40 @@ static int _grid_index_as_1d(int x, int y, int grid_width) {
 	return x + grid_width * y;
 }
 
+DataFrame _curves_as_df(std::vector<lefer::Curve> &curves, int n_steps) {
+  int n_curves = curves.size();
+  NumericVector x(n_curves * n_steps);
+  NumericVector y(n_curves * n_steps);
+  NumericVector direction_ids(n_curves * n_steps);
+  NumericVector step_ids(n_curves * n_steps);
+  NumericVector steps_taken(n_curves * n_steps);
+  NumericVector curve_ids(n_curves * n_steps);
+
+  int row_index = 0;
+  for (int curve_id = 0; curve_id < n_curves; curve_id++) {
+    lefer::Curve curve = curves[curve_id];
+    for (int i = 0; i < curve._steps_taken; i++) {
+      curve_ids[row_index] = curve._curve_id;
+      steps_taken[row_index] = curve._steps_taken;
+      x[row_index] = curve._x[i];
+      y[row_index] = curve._y[i];
+      direction_ids[row_index] = curve._direction[i];
+      step_ids[row_index] = curve._step_id[i];
+
+      row_index++;
+    }
+  }
+
+
+  return DataFrame::create(
+    Named("curve_id") = curve_ids,
+    Named("steps_taken") = steps_taken,
+    Named("x") = x,
+    Named("y") = y,
+    Named("direction_id") = direction_ids,
+    Named("step_ids") = step_ids
+  );
+}
 
 
 

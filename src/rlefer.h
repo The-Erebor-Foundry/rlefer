@@ -93,7 +93,7 @@ public:
 
 
 SeedPointsQueue collect_seedpoints (Curve* curve, double d_sep);
-
+Rcpp::DataFrame _curves_as_df(std::vector<lefer::Curve> &curves, int n_steps);
 
 
 Curve draw_curve(int curve_id,
