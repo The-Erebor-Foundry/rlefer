@@ -295,9 +295,7 @@ DataFrame _curves_as_df(std::vector<lefer::Curve> &curves, int n_steps) {
   int row_index = 0;
   for (int curve_id = 0; curve_id < n_curves; curve_id++) {
     lefer::Curve curve = curves[curve_id];
-    Rprintf("[INFO]: New curve %d\n", curve._curve_id);
     for (int i = 0; i < curve._steps_taken; i++) {
-      Rprintf("[INFO]: Row index %d\n", row_index);
       curve_ids[row_index] = curve._curve_id;
       steps_taken[row_index] = curve._steps_taken;
       x[row_index] = curve._x[i];
