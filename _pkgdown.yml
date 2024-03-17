@@ -2,3 +2,8 @@ url: ~
 template:
   bootstrap: 5
 
+reference:
+- title: "Main API"
+  contents:
+  - even_spaced_curves
+  - non_overlapping_curves

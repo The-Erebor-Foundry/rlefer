@@ -11,8 +11,7 @@ Encoding: UTF-8
 Imports: 
     dplyr,
     Rcpp (>= 1.0.12),
-    tibble,
-    utils
+    tibble
 Suggests:
     ambient
 LinkingTo: Rcpp

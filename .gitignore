@@ -5,5 +5,4 @@
 *.o
 *.dll
 *.so
-docs
 *.rds
