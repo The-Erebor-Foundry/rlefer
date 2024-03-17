@@ -46,6 +46,12 @@ If you want to draw curves that do not overlap each other, but you do not care a
 between each other, then, the function `rlefer::even_spaced_curves()` is more
 suitable for you.
 
+In the example below, we are attempting to draw 100 curves into the flow field,
+using 0.5 as the "separating distance", 2.4 as the "step length",
+and 30 steps for each curve, with a minimum number of steps allowed of 5.
+We get as a result, a tibble object with the x and y coordinates of each
+curve that was drawn.
+
 ```r
 library(rlefer)
 curves <- even_spaced_curves(
