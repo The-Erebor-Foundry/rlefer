@@ -6,6 +6,9 @@
 \usage{
 point_order(direction_id)
 }
+\arguments{
+\item{direction_id}{a integer vector with direction IDs.}
+}
 \description{
 Helper function to get the order ID of each point
 in the curve.

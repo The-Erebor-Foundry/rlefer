@@ -7,3 +7,5 @@
 *.so
 *.rds
 inst/doc
+/doc/
+/Meta/

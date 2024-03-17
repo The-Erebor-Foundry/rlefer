@@ -23,7 +23,7 @@ library(ggplot2)
 
 flow_field_width <- 120
 step_length <- 0.01 * flow_field_width
-d_sep <- 0.01 * flow_field_width
+d_sep <- 0.1 * flow_field_width
 
 set.seed(50)
 flow_field <- noise_perlin(c(flow_field_width, flow_field_width))

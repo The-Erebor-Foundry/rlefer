@@ -47,11 +47,14 @@ public:
 };
 
 
-struct DensityCell {
-	std::vector<double> x;
-	std::vector<double> y;
-	int capacity;
-	int space_used;
+class DensityCell {
+public:
+  std::vector<double> x;
+  std::vector<double> y;
+  int capacity;
+  int space_used;
+public:
+  DensityCell(int cell_capacity);
 };
 
 
