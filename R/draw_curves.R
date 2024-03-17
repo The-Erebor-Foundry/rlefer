@@ -70,6 +70,7 @@
 #'
 #' @examples
 #' library(ambient)
+#' library(rlefer)
 #' set.seed(50)
 #' flow_field <- noise_perlin(c(240, 240))
 #' # The coordinates x = 45 and y = 24 are used as the starting point:
@@ -201,6 +202,7 @@ even_spaced_curves <- function(x_start,
 #'
 #' @examples
 #' library(ambient)
+#' library(rlefer)
 #' set.seed(50)
 #' flow_field <- noise_perlin(c(240, 240))
 # set.seed(80)
