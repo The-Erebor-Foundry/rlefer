@@ -31,7 +31,7 @@ flow_field <- flow_field * 2 * pi
 # The coordinates x = 45 and y = 24 are used as the starting point:
 curves <- even_spaced_curves(
   45, 24,
-  300,
+  10,
   80,
   10,
   step_length,

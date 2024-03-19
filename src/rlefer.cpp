@@ -64,7 +64,6 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
   curves.reserve(n_curves);
   double x = x_start;
   double y = y_start;
-  int curve_array_index = 0;
   int curve_id = 0;
   lefer::Curve curve = draw_curve(
     curve_id,
@@ -78,10 +77,8 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
 
   curves.emplace_back(curve);
   density_grid.insert_curve_coords(&curve);
-  curve_array_index++;
 
-
-  while (curve_id < n_curves && curve_array_index < n_curves) {
+  while (curve_id < n_curves && curves.size() < n_curves) {
     lefer::SeedPointsQueue queue = lefer::SeedPointsQueue(n_steps);
     if (curve_id >= curves.size()) {
       // There is no more curves to be analyzed in the queue
@@ -89,11 +86,14 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
     }
     queue = collect_seedpoints(&curves.at(curve_id), d_sep);
     for (lefer::Point p: queue._points) {
+      if (curves.size() >= n_curves) {
+        break;
+      }
       // check if it is valid given the current state
       if (density_grid.is_valid_next_step(p.x, p.y)) {
         // if it is, draw the curve from it
         lefer::Curve curve = draw_curve(
-          curve_array_index,
+          curves.size(),
           p.x, p.y,
           n_steps,
           step_length,
@@ -109,7 +109,6 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
         curves.emplace_back(curve);
         // insert this new curve into the density grid
         density_grid.insert_curve_coords(&curve);
-        curve_array_index++;
       }
     }
 
@@ -462,8 +461,8 @@ void DensityGrid::insert_coord(double x, double y) {
 	int capacity = _grid[density_index].capacity;
 
 	if ((space_used + 1) < capacity) {
-		_grid[density_index].x.emplace_back(x);
-		_grid[density_index].y.emplace_back(y);
+		_grid[density_index].x[space_used] = x;
+		_grid[density_index].y[space_used] = y;
 		_grid[density_index].space_used++;
 	}
 }
@@ -503,13 +502,13 @@ bool DensityGrid::is_valid_next_step(double x, double y) {
 				double y2 = _grid[density_index].y.at(i);
 				double dist = distance(x, y, x2, y2);
 				if (dist <= d_test) {
-					return 0;
+					return false;
 				}
 			}
 		}
 	}
 
-	return 1;
+	return true;
 }
 
 
