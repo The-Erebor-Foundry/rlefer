@@ -56,7 +56,7 @@ SEXP even_spaced_curves_impl(SEXP x_start1,
   lefer::DensityGrid density_grid = lefer::DensityGrid(
     flow_field_width, flow_field_width,
     d_sep,
-    2000
+    200
   );
 
 
@@ -150,7 +150,7 @@ DataFrame non_overlapping_curves_impl(List starting_points,
   lefer::DensityGrid density_grid = lefer::DensityGrid(
     flow_field_width, flow_field_width,
     d_sep,
-    2000
+    200
   );
 
 
@@ -464,6 +464,12 @@ void DensityGrid::insert_coord(double x, double y) {
 		_grid[density_index].x[space_used] = x;
 		_grid[density_index].y[space_used] = y;
 		_grid[density_index].space_used++;
+	} else {
+	  _grid[density_index].x.reserve(capacity * 2);
+	  _grid[density_index].y.reserve(capacity * 2);
+	  _grid[density_index].capacity = capacity * 2;
+	  _grid[density_index].x[space_used] = x;
+	  _grid[density_index].y[space_used] = y;
 	}
 }
 

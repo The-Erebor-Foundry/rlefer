@@ -83,7 +83,7 @@ utils::globalVariables(".data")
 #'   30,
 #'   5,
 #'   0.01*240,
-#'   0.5,
+#'   1.5,
 #'   flow_field
 #' )
 #' @export
@@ -233,7 +233,7 @@ even_spaced_curves <- function(x_start,
 #'   30,
 #'   5,
 #'   0.01*240,
-#'   0.5,
+#'   1.2,
 #'   flow_field
 #' )
 #' @export

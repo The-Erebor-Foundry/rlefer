@@ -7,6 +7,14 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+`rlefer` is a R package that provides an interface to the Jobard and Lefer (1997)
+algorithm implemented in C++. You can use this algorithm to draw non-overlapping
+and evenly-spaced curves in a flow field (or a "vector field" if you prefer to call it this way).
+
+If you want deep details about how the algorithm works, there is
+a scientific paper (Jobard and Lefer 1997) that describes it. But
+you might find [this article useful as well](https://pedro-faria.netlify.app/posts/2024/2024-02-19-flow-even/en/index.html).
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -14,26 +22,181 @@ knitr::opts_chunk$set(
 )
 ```
 
+# A first example
+
+In order to draw any curve with `rlefer`, we first need to generate
+a flow field. One important detail, this flow field needs
+to be a square (width equal to height).
+
+## Generating a flow field
+
+As a first example, let's draw evenly-spaced curves in a flow field
+with 120x120 dimensions. We can generate such flow field
+with the `ambient` R package like this:
+
+```{r}
+library(ambient)
+flow_field_width <- 120
+set.seed(50)
+flow_field <- noise_perlin(c(flow_field_width, flow_field_width))
+```
+
+To make the flow field stronger and more violent, I scale the values in the
+flow field by multiplying them by $2\pi$:
+
+```{r}
+flow_field <- 2 * pi * flow_field
+```
+
+We can visualize this flow field as a grid of angle values, like this:
+
+```{r}
+library(tidyverse)
+
+build_grid_df <- function(angles, n) {
+  tibble(
+    x = rep(seq_len(n), each = n),
+    y = rep(seq_len(n), times = n),
+    value = angles |> as.vector()
+  )
+}
+
+visualize_grid <- function(grid, n){
+  # Calculate the n^2 lines
+  grid <- grid %>% 
+    mutate(
+      line_id = seq_len(nrow(grid)),
+      xend = cos(value),
+      yend = sin(value),
+    )
+  
+  # Spread the lines across the grid
+  grid <- grid %>% 
+    mutate(
+      xend = xend + x,
+      yend = yend + y
+    )
+  
+  # Plot these lines
+  u <- "inches"
+  a <- arrow(length = unit(0.025, u))
+  ggplot(grid) +
+    geom_segment(
+      aes(
+        x = x, y = y,
+        xend = xend,yend = yend,
+        group = line_id
+      ),
+      arrow = a
+    ) +
+    coord_cartesian(
+      xlim = c(0,n), ylim = c(0,n)
+    ) +
+    theme_void()
+}
+
+grid <- build_grid_df(flow_field, flow_field_width)
+visualize_grid(grid, flow_field_width)
+```
+
+
+# How curves are drawn in `rlefer`?
+
+The functions from `rlefer` draws curves by walking through the flow field.
+In other words, we start somewhere in the flow field, and
+we start to walk by following the direction of the
+angle values we encounter trough the flow field.
+
+
+As we walk trough, we record the x and y coordinates of each step we
+take, and, at the end of the process, we will have a sequence of
+points, that we can connect to form a curve.
+So each curve drawn by `rlefer` is essentially a sequence
+of points that we can connect to visualize the curve
+they represent.
+
+If we do that with `ggplot2` for example, we can use geoms
+such as `geom_path()` or `geom_line()` to visualize these
+curves.
+
+
+# Drawing evenly-spaced curves with `rlefer`
+
+Now that we have our flow field prepared, we can start to
+draw curves into this flow field.
+
+Here, you want to decide if you want to draw curves that are not only
+non-overlapping, but also, curves that are evenly-spaced between each
+other.
+
+If you want to avoid overlapping curves, and want to have full control over
+the starting points of each curve, you should use the `rlefer::non_overlapping_curves()` function. This function uses
+just the part of the Jobard and Lefer (1997) algorithm that
+is responsible for the overlap checking to draw non-overlapping curves.
+
+In contrast, if want to both avoid overlapping curves, and also want
+your curves to be evenly-spaced between each other, the,
+you should use the `rlefer::even_spaced_curves()` function, which
+takes full advantage of the Jobard and Lefer (1997) algorithm
+to draw curves that are both non-overlapping, and also,
+are evenly-spaced between each other.
+
+As our first example, let's consider we want to draw both
+non-overlapping and evenly-spaced curves. That is why we
+are going to use the `rlefer::even_spaced_curves()` function.
+
+To use this function we want to set some variables. First,
+we want to decide the point where in the flow field we
+are going to start drawing curves. This a single point,
+and going to be the starting point of the first point
+drawn in the flow field.
+
+So, if you ask the function to draw 100 curves, it
+will first draw a single curve from the x and y
+coordinates you gave as the starting point. And then,
+the function will start to draw the remaining 99 curves,
+by picking starting points that are `d_sep` of distance
+from the curve. So all remaining curves are
+automatically derived from this first curve drawn.
+
+In our example, I will set the starting point to x = 45
+and y = 24. These numbers need to be inside the flow field
+bounds. So both `x < flow_field_width` and `y < flow_field_width`
+needs to be true.
+
+Let's start by drawing 100 curves. We will walk 40 steps (`n_steps`) in each curve, and in each step, and we will
+walk a distance of 1% of the flow field width (`step_length`) in each step.
+If you raise the number of steps taken, the curves drawn will be longer, otherwise,
+they will look shorter.
+
+Also, if you raise the distance taken in each step, your curve will
+be longer. But the curve you get as result, might be not very precise, and
+will probably look a bit ugly. If you set this number too low, you curve will look
+short even if the number of steps taken for each curve are very high.
+So, be careful with this number, don't set it
+to high or too low. 1% of the flow field width is usually a good number.
+
+Now, the distance between each curve (`d_sep`), which is called as the "separating
+distance" here, will be `1.0`. The algorithm will constantly check if each curve
+is at a minimum distance of `d_sep` from each of it's neighbors.
 
 
 ```{r setup}
 library(rlefer)
-library(ambient)
 library(ggplot2)
 
-flow_field_width <- 120
+n_steps <- 40
+n_curves <- 100
+min_allowed_steps <- 5
 step_length <- 0.01 * flow_field_width
-d_sep <- 0.1 * flow_field_width
+d_sep <- 1.0
 
-set.seed(50)
-flow_field <- noise_perlin(c(flow_field_width, flow_field_width))
-flow_field <- flow_field * 2 * pi
 # The coordinates x = 45 and y = 24 are used as the starting point:
 curves <- even_spaced_curves(
   45, 24,
-  10,
-  80,
-  10,
+  n_curves,
+  n_steps,
+  min_allowed_steps,
   step_length,
   d_sep,
   flow_field
@@ -51,4 +214,108 @@ ggplot(curves) +
   theme_void()
 ```
 
+
+If we raise the number of steps, we will get longer curves, and the
+spatial distribution of the curves might change also. Because with
+longer curves, new spots, or new positions become available
+to the algorithm as candidates for starting points of new curves.
+
+Also, if we raise the number of curves, then, there will be more curves
+obviously in the image, and, as a result, the image will look more full.
+
+For example, let's raise the number of steps to 70, and the number of
+curves to 300:
+
+```{r}
+n_curves <- 300
+n_steps <- 70
+
+curves <- even_spaced_curves(
+  45, 24,
+  n_curves,
+  n_steps,
+  min_allowed_steps,
+  step_length,
+  d_sep,
+  flow_field
+)
+
+ggplot(curves) +
+  geom_path(
+    aes(x, y, group = curve_id)
+  ) +
+  coord_cartesian(
+    xlim = c(0, flow_field_width),
+    ylim = c(0, flow_field_width)
+  ) +
+  theme_void()
+```
+
+
+We can continue to increase the number of curves to fill more of the image,
+until it gets completely filled with curves.
+
+
+# Drawing non-overlapping curves
+
+You might get frustrated with `rlefer::even_spaced_curve()`,
+because it selects the starting points for all derived
+curves automatically for you. And you might want to have better control
+over where each curve starts.
+
+If that is your case,
+then, you should use the `rlefer::non_overlapping_curves()`
+function instead. This function accepts a list with starting points
+for each curve.
+
+In other words, each element of this input list, is another list
+with two named elements (`x` and `y`) that contains the x and y
+coordinates of a starting point. The number of curves you
+want to draw is automatically derived from the length
+of this input list.
+
+So the function will draw a curve from each starting point
+described in this list, and it will constantly check if
+each curve is overlapping or not it's neighbors curves.
+
+In the example below, I am using `runif()` to randomly select
+starting points across the flow field.
+
+```{r}
+set.seed(80)
+xs <- runif(n_curves)
+set.seed(90)
+ys <- runif(n_curves)
+xs <- xs * flow_field_width
+ys <- ys * flow_field_width
+starting_points <- list()
+for(i in seq_len(n_curves)) {
+  starting_points[[i]] <- list(x = xs[i], y = ys[i])
+}
+
+curves <- non_overlapping_curves(
+  starting_points,
+  n_steps,
+  5,
+  step_length,
+  d_sep,
+  flow_field
+)
+
+ggplot(curves) +
+  geom_path(
+    aes(x, y, group = curve_id)
+  ) +
+  coord_cartesian(
+    xlim = c(0, flow_field_width),
+    ylim = c(0, flow_field_width)
+  ) +
+  theme_void()
+```
+
+
+
+# References
+
+Jobard, Bruno, and Wilfrid Lefer. 1997. “Creating Evenly-Spaced Streamlines of Arbitrary Density.” In Visualization in Scientific Computing ’97, edited by Wilfrid Lefer and Michel Grave, 43–55. Vienna: Springer Vienna.
 
